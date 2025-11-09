@@ -204,40 +204,64 @@ class QAPipeline:
         print(f"Found {len(supported_files)} supported files to process")
         
         try:
+            import time
+            start_time = time.time()
+
             # Process documents
-            print("Processing documents...")
+            print("=" * 60)
+            print("STEP 1/3: Processing documents...")
+            print("=" * 60)
             chunks = self.document_processor.process_directory(str(COURSE_MATERIALS_DIR))
-            
+
             if not chunks:
                 print("ERROR: No chunks created from documents")
                 return False
-            
-            print(f"Created {len(chunks)} text chunks")
-            
+
+            print(f"✓ Created {len(chunks)} text chunks")
+            step1_time = time.time() - start_time
+            print(f"  Time: {step1_time:.1f}s")
+
             # Encode chunks
-            print("Encoding chunks with embeddings...")
+            print("\n" + "=" * 60)
+            print("STEP 2/3: Encoding chunks with embeddings...")
+            print(f"  This may take 2-5 minutes for large documents...")
+            print("=" * 60)
+            step2_start = time.time()
             encoded_chunks = self.embedding_manager.encode_chunks(chunks)
-            
+
             if not encoded_chunks:
                 print("ERROR: Failed to encode chunks")
                 return False
-            
-            print(f"Encoded {len(encoded_chunks)} chunks")
-            
+
+            step2_time = time.time() - step2_start
+            print(f"✓ Encoded {len(encoded_chunks)} chunks")
+            print(f"  Time: {step2_time:.1f}s")
+
             # Store in database
-            print("Storing in vector database...")
+            print("\n" + "=" * 60)
+            print("STEP 3/3: Storing in vector database...")
+            print("=" * 60)
+            step3_start = time.time()
             success = self.chroma_manager.add_documents(encoded_chunks)
-            
+
             if not success:
                 print("ERROR: Failed to store documents in database")
                 return False
-            
-            print("Knowledge base setup completed successfully!")
-            
+
+            step3_time = time.time() - step3_start
+            total_time = time.time() - start_time
+
+            print(f"✓ Stored successfully")
+            print(f"  Time: {step3_time:.1f}s")
+            print("\n" + "=" * 60)
+            print("✓ KNOWLEDGE BASE SETUP COMPLETED SUCCESSFULLY!")
+            print("=" * 60)
+            print(f"Total time: {total_time:.1f}s ({total_time/60:.1f} minutes)")
+
             # Verify storage
             stats = self.chroma_manager.get_collection_stats()
             print(f"Database contains {stats.get('total_documents', 0)} documents from {stats.get('unique_source_files', 0)} files")
-            
+
             return True
             
         except Exception as e:

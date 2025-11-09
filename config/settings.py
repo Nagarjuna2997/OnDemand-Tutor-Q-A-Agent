@@ -14,8 +14,9 @@ COLLECTION_NAME = "network_security_course"
 
 # Embedding model settings
 EMBEDDING_MODEL = "multi-qa-MiniLM-L6-cos-v1"
-CHUNK_SIZE = 1000
-CHUNK_OVERLAP = 200
+CHUNK_SIZE = 1000  # Number of words per chunk
+CHUNK_OVERLAP = 200  # Overlap between chunks for better context
+EMBEDDING_BATCH_SIZE = 128  # Optimized batch size for faster encoding (default was 32)
 
 # GPT4All settings
 LLM_MODEL_NAME = "mistral-7b-openorca.gguf2.Q4_0.gguf"  # Fallback if Gemma not available

@@ -40,18 +40,19 @@ class EmbeddingManager:
             print(f"Error encoding text: {str(e)}")
             raise e
     
-    def encode_texts(self, texts: List[str], batch_size: int = 32, show_progress: bool = True) -> np.ndarray:
+    def encode_texts(self, texts: List[str], batch_size: int = 128, show_progress: bool = True) -> np.ndarray:
         """Convert multiple texts to embedding vectors in batches."""
         if not self.model:
             raise RuntimeError("Embedding model not loaded")
-        
+
         if not texts:
             return np.array([])
-        
+
         try:
+            print(f"Encoding {len(texts)} texts with batch size {batch_size}...")
             # Generate embeddings in batches for efficiency
             embeddings = self.model.encode(
-                texts, 
+                texts,
                 batch_size=batch_size,
                 show_progress_bar=show_progress,
                 convert_to_numpy=True
@@ -61,19 +62,19 @@ class EmbeddingManager:
             print(f"Error encoding texts: {str(e)}")
             raise e
     
-    def encode_chunks(self, chunks: List[Dict[str, str]], batch_size: int = 32) -> List[Dict]:
+    def encode_chunks(self, chunks: List[Dict[str, str]], batch_size: int = 128) -> List[Dict]:
         """Encode document chunks and return with embeddings and metadata."""
         if not chunks:
             return []
-        
-        print(f"Encoding {len(chunks)} chunks...")
-        
+
+        print(f"Encoding {len(chunks)} chunks with optimized batch size ({batch_size})...")
+
         # Extract text content from chunks
         texts = [chunk['content'] for chunk in chunks]
-        
+
         # Generate embeddings
         embeddings = self.encode_texts(texts, batch_size=batch_size)
-        
+
         # Combine chunks with their embeddings
         encoded_chunks = []
         for i, chunk in enumerate(chunks):
@@ -84,7 +85,7 @@ class EmbeddingManager:
                 'metadata': chunk['metadata']
             }
             encoded_chunks.append(encoded_chunk)
-        
+
         print(f"Successfully encoded {len(encoded_chunks)} chunks")
         return encoded_chunks
     

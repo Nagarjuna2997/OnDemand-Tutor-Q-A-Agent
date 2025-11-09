@@ -1,0 +1,9 @@
+gpt4all
+sentence-transformers
+chromadb
+numpy
+pandas
+python-dotenv
+streamlit
+PyPDF2
+python-docx
